@@ -4,12 +4,6 @@ module.exports = {
       type: Sequelize.INTEGER,
       allowNull: false,
       autoIncrement: true,
-    },
-    uuid: {
-      type: Sequelize.UUID,
-      default: Sequelize.UUIDV4,
-      allowNull: false,
-      unique: true,
       primaryKey: true,
     },
     name: {

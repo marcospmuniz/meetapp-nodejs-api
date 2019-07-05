@@ -32,10 +32,54 @@ class UserController {
       res.status(400).json({ error: 'Email already used!' });
     }
 
-    const { uuid, name, email } = await User.create(req.body);
+    const { id, name, email } = await User.create(req.body);
 
     return res.json({
-      uuid,
+      id,
+      name,
+      email,
+    });
+  }
+
+  async update(req, res) {
+    const schema = Yup.object().shape({
+      name: Yup.string().max(75),
+      email: Yup.string()
+        .email()
+        .max(75),
+      oldPassword: Yup.string()
+        .min(8)
+        .required(),
+      password: Yup.string().min(8),
+      confirmPassword: Yup.string()
+        .min(8)
+        .when('password', (password, field) => (password ? field.required().oneOf([Yup.ref('password')]) : field)),
+    });
+
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: 'Validation fails!' });
+    }
+
+    const { email, oldPassword } = req.body;
+
+    const user = await User.findByPk(req.userId);
+
+    if (user.email !== email) {
+      const emailExists = User.findOne({ where: { email } });
+
+      if (emailExists) {
+        return res.status(400).json({ error: 'Email aready in use!' });
+      }
+    }
+
+    if (oldPassword && !(await user.checkPassword(oldPassword))) {
+      return res.status(400).json({ error: 'Password does not match!' });
+    }
+
+    const { id, name } = await user.update(req.body);
+
+    return res.json({
+      id,
       name,
       email,
     });
