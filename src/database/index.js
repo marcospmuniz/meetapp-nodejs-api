@@ -4,12 +4,14 @@ import databaseConfig from '../config/database';
 
 import User from '../app/models/User';
 import File from '../app/models/File';
+import Meetup from '../app/models/Meetup';
 
-const models = [User, File];
+const models = [User, File, Meetup];
 
 class Database {
   constructor() {
     this.init();
+    this.associate();
   }
 
   init() {
@@ -19,6 +21,15 @@ class Database {
     // a conexão com o banco de dados como parametro para o init() de cada
     // model registrado na aplicação
     models.map(model => model.init(this.connection));
+  }
+
+  associate() {
+    models.forEach((model) => {
+      if (model.associate) {
+        // só chama a ssociação se o model tiver o método associate
+        model.associate(this.connection.models);
+      }
+    });
   }
 }
 
