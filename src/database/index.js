@@ -26,7 +26,7 @@ class Database {
   associate() {
     models.forEach((model) => {
       if (model.associate) {
-        // só chama a ssociação se o model tiver o método associate
+        // só chama a associação se o model tiver o método associate
         model.associate(this.connection.models);
       }
     });
